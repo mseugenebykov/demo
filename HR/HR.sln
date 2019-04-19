@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HR", "HR\HR.csproj", "{1CFA4A0D-628D-4A8D-8A99-BEBEA8354088}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRFunction", "HRFunction\HRFunction.csproj", "{5BB14B95-5B80-420F-A4D0-18D0D56517A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRFunction", "HRFunction\HRFunction.csproj", "{5BB14B95-5B80-420F-A4D0-18D0D56517A1}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "HRAzureCustomProvider", "HRAzureCustomProvider\HRAzureCustomProvider.deployproj", "{614D02B2-82D8-4691-9A4A-241C13A5BC04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{5BB14B95-5B80-420F-A4D0-18D0D56517A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BB14B95-5B80-420F-A4D0-18D0D56517A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BB14B95-5B80-420F-A4D0-18D0D56517A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{614D02B2-82D8-4691-9A4A-241C13A5BC04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{614D02B2-82D8-4691-9A4A-241C13A5BC04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{614D02B2-82D8-4691-9A4A-241C13A5BC04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{614D02B2-82D8-4691-9A4A-241C13A5BC04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

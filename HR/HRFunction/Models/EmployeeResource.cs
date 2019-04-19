@@ -4,10 +4,27 @@ using System.Text;
 
 namespace HRFunction.Models
 {
+    public class EmployeeResourceCollection
+    {
+        public EmployeeResource[] value { get; set; }
+
+        public EmployeeResourceCollection()
+        {
+        }
+        public EmployeeResourceCollection(string requestPath, Employee[] employees)
+        {
+            if (employees != null)
+            {
+                this.value = new EmployeeResource[employees.Length];
+                for (int i = 0; i < employees.Length; i++) this.value[i] = new EmployeeResource(requestPath, employees[i]);
+            }
+        }
+    }
+
     public class EmployeeResource
     {
-        public const string ResourceTypeName = "Microsoft.CustomProviders/resourceproviders/Employee";
-
+        public const string ResourceTypeName = "Microsoft.CustomProviders/resourceproviders/employees";
+        
         public class EmployeeResourceProperties
         {
             public string id { get; set; }
