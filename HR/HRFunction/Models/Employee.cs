@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HRFunction.Models
 {
-    public class Employee
+    internal class Employee
     {
         public Guid ID { get; set; }
         public string Name { get; set; }

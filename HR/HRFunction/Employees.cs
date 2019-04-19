@@ -17,52 +17,53 @@ namespace HRFunction
 {
     public static class Employees
     {
-        private const string ApiUri = "Employees";
+        private static readonly string ApiUri = Environment.GetEnvironmentVariable("ApiHostBaseUrl") + "Employees";
+
+        private static HttpClient httpClient = new HttpClient();
 
         [FunctionName("Employees")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("Employee request. Method: " + req.Method);
 
-            string requestPath = null;
-            StringValues headerValue;
-            if (req.Headers.TryGetValue("x-ms-customproviders-requestpath", out headerValue) && (headerValue.Count > 0))
-            {
-                requestPath = headerValue[0];
-            }
+            var request = new ArmRequest(req);
 
             switch (req.Method.ToUpperInvariant())
             {
-                case "GET": return await Employees.Get(requestPath, log);
+                case "GET": return await Employees.Get(request, log);
+                case "POST": return await Employees.Post(request, log);
             }
 
             return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
-        private static async Task<HttpResponseMessage> Get(string requestPath, ILogger log)
+        private static async Task<HttpResponseMessage> Get(ArmRequest request, ILogger log)
         {
-            string result = null;
-            string apiHost = Environment.GetEnvironmentVariable("ApiHostBaseUrl");
+            log.LogInformation("Get employee collection.");
 
-            log.LogInformation("Get employee collection request.");
+            var response = await httpClient.GetAsync(ApiUri);
 
-            using (var client = new HttpClient())
+            if (response.IsSuccessStatusCode)
             {
-                var response = await client.GetAsync(apiHost + ApiUri);
+                var employees = JsonConvert.DeserializeObject<Employee[]>(await response.Content.ReadAsStringAsync());
+                var result = ArmResourceCollection<EmployeeResource>.Create<Employee>(request, employees, e => (new EmployeeResource(e)));
 
-                if (response.IsSuccessStatusCode)
+                return new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    var resultObjects = JsonConvert.DeserializeObject<Employee[]>(await response.Content.ReadAsStringAsync());
-                    result = JsonConvert.SerializeObject(new EmployeeResourceCollection(requestPath, resultObjects));
-                }
+                    Content = new StringContent(JsonConvert.SerializeObject(result), Encoding.UTF8, "application/json")
+                };
             }
-
-            return new HttpResponseMessage(HttpStatusCode.OK)
+            else
             {
-                Content = new StringContent(result, Encoding.UTF8, "application/json")
-            };
+                return new HttpResponseMessage(response.StatusCode);
+            }
+        }
+
+        private static async Task<HttpResponseMessage> Post(ArmRequest request, ILogger log)
+        {
+            return null;
         }
     }
 }
