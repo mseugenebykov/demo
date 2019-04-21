@@ -2,12 +2,11 @@
 @model HR.Pages.EmployeeFunctions.CreateModel
 
 @{
-    ViewData["Title"] = "Create (Function)";
+    ViewData["Title"] = "Sign up (Function)";
 }
 
-<h2>Create (Function)</h2>
+<h2>@ViewData["Title"]</h2>
 
-<h4>Employee</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -34,7 +33,7 @@
                 <span asp-validation-for="Employee.Department" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Sign up" class="btn btn-default" />
             </div>
         </form>
     </div>
