@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using HR.Data;
+using HR.Models;
+using System.Net.Http;
+
+namespace HR.Pages.EmployeeFunctions
+{
+    public class CreateModel : PageModel
+    {
+        private const string FunctionURI = "/api/EmployeeFunctions";
+
+        private readonly HR.Data.ApplicationDbContext _context;
+        private static HttpClient httpClient = new HttpClient();
+
+        public CreateModel(HR.Data.ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public IActionResult OnGet()
+        {
+            this.Employee = new Employee
+            {
+                ID = Guid.NewGuid()
+            };
+
+            return Page();
+        }
+
+        [BindProperty]
+        public Employee Employee { get; set; }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            var response = await httpClient.PostAsJsonAsync<Employee>(
+                string.Format("{0}://{1}{2}", this.HttpContext.Request.Scheme, this.HttpContext.Request.Host, FunctionURI),
+                this.Employee);
+
+            return RedirectToPage((response.IsSuccessStatusCode) ? "../Tools": "../Error"); 
+        }
+    }
+}

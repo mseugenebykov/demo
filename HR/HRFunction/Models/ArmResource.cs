@@ -24,7 +24,7 @@ namespace HRFunction.Models
                 result.value = new ArmResource<T>[resources.Length];
                 for (int i = 0; i < resources.Length; i++)
                 {
-                    result.value[i] = new ArmResource<T>(request, create(resources[i]));
+                    result.value[i] = ArmResource<T>.Create(request, create(resources[i]));
                 }
             }
             else
@@ -36,23 +36,21 @@ namespace HRFunction.Models
         }
     }
 
-    internal class ArmResource<T> where T: IArmResourceProperties
+    internal class ArmResource<T>: ArmResourceBase<T> where T: IArmResourceProperties
     {
         private const string ResourceTypeName = "Microsoft.CustomProviders/resourceproviders/";
 
         public string id { get; set; }
         public string name { get; set; }
         public string type { get; set; }
-        public T properties { get; set; }
 
         public ArmResource()
         {
         }
 
-        public ArmResource(ArmRequest request, T resource)
+        protected ArmResource(ArmRequest request, T resource)
+            :base(resource)
         {
-            if (resource == null) throw new ArgumentNullException("resource");
-
             this.name = resource.GetArmResourceName();
             if (string.IsNullOrWhiteSpace(this.name)) throw new ArgumentNullException(resource.GetArmResourceName());
 
@@ -61,8 +59,12 @@ namespace HRFunction.Models
             this.type = ResourceTypeName + val;
 
             this.id = request.GetResourceId(this.name);
+        }
 
-            this.properties = resource;
+        public static ArmResource<T> Create(ArmRequest request, T resource)
+        {
+            if (resource == null) throw new ArgumentNullException("resource");
+            return new ArmResource<T>(request, resource);
         }
     }
 }

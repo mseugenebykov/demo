@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Text;
 using HRFunction.Models;
+using Newtonsoft.Json.Linq;
 
 namespace HRFunction
 {
@@ -48,7 +49,7 @@ namespace HRFunction
             if (response.IsSuccessStatusCode)
             {
                 var employees = JsonConvert.DeserializeObject<Employee[]>(await response.Content.ReadAsStringAsync());
-                var result = ArmResourceCollection<EmployeeResource>.Create<Employee>(request, employees, e => (new EmployeeResource(e)));
+                var result = ArmResourceCollection<ArmEmployeeResource>.Create<Employee>(request, employees, e => (new ArmEmployeeResource(e)));
 
                 return new HttpResponseMessage(HttpStatusCode.OK)
                 {
@@ -63,7 +64,18 @@ namespace HRFunction
 
         private static async Task<HttpResponseMessage> Post(ArmRequest request, ILogger log)
         {
-            return null;
+            log.LogInformation("Post employee. ID: " );
+
+            var body = await request.Request.ReadAsStringAsync();
+            var resource = JsonConvert.DeserializeObject<ArmResourceBase<EmployeeResource>>(body);
+
+            var response = await httpClient.PostAsJsonAsync<Employee>(ApiUri, resource.properties.GetValue());
+            return (response.IsSuccessStatusCode) ?
+                new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(body, Encoding.UTF8, "application/json")
+                }:
+                new HttpResponseMessage(response.StatusCode);
         }
     }
 }

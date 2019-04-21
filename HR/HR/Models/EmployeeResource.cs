@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HRFunction.Models
+namespace HR.Models
 {
     internal class EmployeeResource
     {
