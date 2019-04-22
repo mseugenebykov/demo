@@ -35,3 +35,19 @@ body {
         display: none;
     }
 }
+
+.homeBackground {
+    background-image: url(/images/logo-big.jpg);
+    background-repeat: no-repeat;
+    background-position-y: 270px;
+    background-size: 100%;
+    background-color: black;
+}
+
+.homeTitle {
+    text-align: center;
+    font-size: 100px;
+    font-family: Helvetica,Arial,sans-serif;
+    font-stretch: ultra-condensed;
+    margin-bottom: -30px;
+}

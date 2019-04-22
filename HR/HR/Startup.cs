@@ -40,6 +40,10 @@ namespace HR
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddHttpClient("employee-functions", c =>
+            {
+                c.BaseAddress = new Uri("https://api.github.com/");
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
