@@ -2,13 +2,16 @@
 @model HR.Pages.Employees.DetailsModel
 
 @{
-    ViewData["Title"] = "Cadet";
+    ViewData["Title"] = "Cadet details";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="title">
+    <h2>@ViewData["Title"]</h2>
+</div>
+
+<hr />
 
 <div>
-    <hr />
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Employee.Name)
