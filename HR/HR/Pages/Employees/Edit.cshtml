@@ -5,14 +5,11 @@
     ViewData["Title"] = "Edit cadet";
 }
 
-<div class="title">
-    <h2>@ViewData["Title"]</h2>
-</div>
-
-<hr />
-
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6 formBody">
+        <div class="title formTitle">
+            <h2>@ViewData["Title"]</h2>
+        </div>
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Employee.ID" />
@@ -31,16 +28,15 @@
                 <input asp-for="Employee.Department" class="form-control" />
                 <span asp-validation-for="Employee.Department" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group formFooter">
                 <input type="submit" value="Save" class="btn btn-default" />
+                &nbsp;
+                <input type="button" value="Cancel" class="btn btn-default" onclick="window.history.back()"/>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

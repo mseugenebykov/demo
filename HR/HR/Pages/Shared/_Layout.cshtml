@@ -21,14 +21,14 @@
                 <a asp-page="/Index" class="navbar-brand">PARNELL AEROSPACE</a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav navbar-right">
                     <li><a asp-page="/Employees/Create">Enlist</a></li>
                     <li><a asp-page="/Employees/Index">Cadets</a></li>
+                    <environment include="Development">
+                        <li><a asp-page="/Tools">Tools</a></li>
+                    </environment>
                     <li><a asp-page="/About">About</a></li>
-                    <li><a asp-page="/Contact">Contact</a></li>
-                    <li><a asp-page="/Tools">Tools</a></li>
                 </ul>
-                <partial name="_LoginPartial" />
             </div>
         </div>
     </nav>

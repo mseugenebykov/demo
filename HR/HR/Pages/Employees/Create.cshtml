@@ -5,15 +5,13 @@
     ViewData["Title"] = "Enlist";
 }
 
-<div class="title">
-    <h2>Are you ready for the final frontier?</h2>
-    <h3>Travelling into space is at your own risk. All injury, which is included but not limited to meteor collissions, parasitical invasions, delusions of grandeur, will not be covered by Parnell Aerospace or any of its associating firms. Terms and Conditions may apply.</h3>
-</div>
-
-<hr />
-
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6 formBody">
+        <div class="title formTitle">
+            <h2>Are you ready for the final frontier?</h2>
+            <h3>Travelling into space is at your own risk. All injury, which is included but not limited to meteor collissions, parasitical invasions, delusions of grandeur, will not be covered by Parnell Aerospace or any of its associating firms. Terms and Conditions may apply.</h3>
+        </div>
+
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -31,7 +29,7 @@
                 <input asp-for="Employee.Department" class="form-control" />
                 <span asp-validation-for="Employee.Department" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group formFooter">
                 <input type="submit" value="Sign up" class="btn btn-default" />
             </div>
         </form>

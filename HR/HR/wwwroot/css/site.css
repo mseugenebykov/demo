@@ -69,4 +69,21 @@ body {
     line-height: 13px;
 }
 
+.formTitle {
+    margin-top: 15%;
+    margin-bottom: 50px;
+}
 
+.formListTitle {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.formBody {
+    margin: auto;
+    float: none;
+}
+
+.formFooter {
+    margin-top: 50px;
+}
