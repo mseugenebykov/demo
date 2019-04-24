@@ -39,9 +39,14 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Department)
                     </td>
-                    <td>
-                        <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                        <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+                    <td align="right">
+                        <a asp-page="./Edit" asp-route-id="@item.ID">
+                            <img src="~/images/pencil.png" width="20" alt="Edit" title="Edit"/>
+                        </a>
+                        &nbsp;
+                        <a asp-page="./Delete" asp-route-id="@item.ID">
+                            <img src="~/images/trash.png" width="20" alt="Delete" title="Delete"/>
+                        </a>
                     </td>
                 </tr>
             }

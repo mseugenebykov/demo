@@ -5,11 +5,11 @@
     ViewData["Title"] = "Sign up (Function)";
 }
 
-<h2>@ViewData["Title"]</h2>
-
-<hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6 formBody">
+        <div class="title formTitle">
+            <h2>@ViewData["Title"]</h2>
+        </div>
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -32,15 +32,11 @@
                 <input asp-for="Employee.Department" class="form-control" />
                 <span asp-validation-for="Employee.Department" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group formFooter">
                 <input type="submit" value="Sign up" class="btn btn-default" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-page="../Tools">Back</a>
 </div>
 
 @section Scripts {
