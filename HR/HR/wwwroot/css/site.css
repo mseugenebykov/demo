@@ -87,3 +87,7 @@ body {
 .formFooter {
     margin-top: 50px;
 }
+
+.contentBack {
+    background-color: rgba(150, 150, 150, 0.30);
+}
