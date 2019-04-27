@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HR.Data;
 using HR.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HR.Controllers
 {
@@ -22,6 +23,7 @@ namespace HR.Controllers
         }
 
         // GET: api/Employees
+        [AllowAnonymous]
         [HttpGet]
         public IEnumerable<Employee> GetEmployee()
         {
@@ -29,6 +31,7 @@ namespace HR.Controllers
         }
 
         // GET: api/Employees/5
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEmployee([FromRoute] Guid id)
         {
