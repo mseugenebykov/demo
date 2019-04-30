@@ -15,12 +15,12 @@ namespace HR.Pages.EmployeeFunctions
     {
         private const string FunctionURI = "/api/EmployeeFunctions";
 
-        private readonly HR.Data.ApplicationDbContext _context;
         private static HttpClient httpClient = new HttpClient();
+        private readonly EmployeeFunctionClient client;
 
-        public CreateModel(HR.Data.ApplicationDbContext context)
+        public CreateModel(IHttpClientFactory clientFactory)
         {
-            _context = context;
+            client = new EmployeeFunctionClient(clientFactory.CreateClient(EmployeeFunctionClient.DefaultClientName));
         }
 
         public IActionResult OnGet()
@@ -43,9 +43,7 @@ namespace HR.Pages.EmployeeFunctions
                 return Page();
             }
 
-            var response = await httpClient.PostAsJsonAsync<Employee>(
-                string.Format("{0}://{1}{2}", this.HttpContext.Request.Scheme, this.HttpContext.Request.Host, FunctionURI),
-                this.Employee);
+            var response = await client.PostAsync(this.HttpContext, this.Employee);
 
             return RedirectToPage((response.IsSuccessStatusCode) ? "../Tools": "../Error"); 
         }

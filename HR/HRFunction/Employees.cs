@@ -13,6 +13,7 @@ using System.Net;
 using System.Text;
 using HRFunction.Models;
 using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
 
 namespace HRFunction
 {
@@ -40,11 +41,22 @@ namespace HRFunction
             return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
+        private static HttpClient GetHttpClient()
+        {
+            return GetHttpClient("demo","password");
+        }
+
+        private static HttpClient GetHttpClient(string username, string password)
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
+            return httpClient;
+        }
+
         private static async Task<HttpResponseMessage> Get(ArmRequest request, ILogger log)
         {
             log.LogInformation("Get employee collection.");
 
-            var response = await httpClient.GetAsync(ApiUri);
+            var response = await GetHttpClient().GetAsync(ApiUri);
 
             if (response.IsSuccessStatusCode)
             {
@@ -69,7 +81,7 @@ namespace HRFunction
             var body = await request.Request.ReadAsStringAsync();
             var resource = JsonConvert.DeserializeObject<ArmResourceBase<EmployeeResource>>(body);
 
-            var response = await httpClient.PostAsJsonAsync<Employee>(ApiUri, resource.properties.GetValue());
+            var response = await GetHttpClient().PostAsJsonAsync<Employee>(ApiUri, resource.properties.GetValue());
             return (response.IsSuccessStatusCode) ?
                 new HttpResponseMessage(HttpStatusCode.OK)
                 {

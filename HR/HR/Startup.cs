@@ -16,6 +16,13 @@ using Microsoft.EntityFrameworkCore;
 using HR.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using System.Text.Encodings.Web;
+using HR.Identity;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using HR.Controllers;
 
 namespace HR
 {
@@ -39,23 +46,25 @@ namespace HR
             });
 
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
+                .AddScheme<AuthenticationSchemeOptions, ApiAuthenticationHandler>(ApiAuthDefaults.AuthenticationScheme, null)
                 .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+
+            services.AddScoped<IApiUserService, ApiUserService>();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddHttpClient("employee-functions", c =>
-            {
-                c.BaseAddress = new Uri("https://api.github.com/");
-            });
+            services.AddHttpClient(EmployeeFunctionClient.DefaultClientName);
+            services.AddHttpClient(EmployeeFunctionsController.ControllerClientName);
 
-            services.AddMvc(options =>
+            services.AddMvc()
+            .AddRazorPagesOptions(options =>
             {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
+                options.Conventions.AuthorizePage("/Index");
+                options.Conventions.AuthorizePage("/Tools");
+                options.Conventions.AuthorizeFolder("/Employees");
+                options.Conventions.AuthorizeFolder("/EmployeeFunctions");
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
