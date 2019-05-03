@@ -1,0 +1,36 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Name": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "Location": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "Department": {
+      "type": "string",
+      "defaultValue": ""
+    }
+  },
+  "variables": {
+    "location": "eastus",
+    "version": "2018-09-01-preview",
+    "provider": "hr"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.CustomProviders/resourceProviders/employees",
+      "name": "[concat(variables('provider'), '/new')]",
+      "apiVersion": "[variables('version')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "name": "[parameters('Name')]",
+        "location": "[parameters('Location')]",
+        "department": "[parameters('Department')]"
+      }
+    }
+  ]
+}

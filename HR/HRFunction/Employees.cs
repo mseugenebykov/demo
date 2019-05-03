@@ -25,7 +25,7 @@ namespace HRFunction
 
         [FunctionName("Employees")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("Employee request. Method: " + req.Method);
@@ -35,7 +35,8 @@ namespace HRFunction
             switch (req.Method.ToUpperInvariant())
             {
                 case "GET": return await Employees.Get(request, log);
-                case "POST": return await Employees.Post(request, log);
+                case "POST": return await Employees.Put(request, log);
+                case "PUT": return await Employees.Put(request, log);
             }
 
             return new HttpResponseMessage(HttpStatusCode.BadRequest);
@@ -74,9 +75,9 @@ namespace HRFunction
             }
         }
 
-        private static async Task<HttpResponseMessage> Post(ArmRequest request, ILogger log)
+        private static async Task<HttpResponseMessage> Put(ArmRequest request, ILogger log)
         {
-            log.LogInformation("Post employee. ID: " );
+            log.LogInformation("Put new employee." );
 
             var body = await request.Request.ReadAsStringAsync();
             var resource = JsonConvert.DeserializeObject<ArmResourceBase<EmployeeResource>>(body);
