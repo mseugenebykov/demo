@@ -1,19 +1,16 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http;
-using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Text;
 using HRFunction.Models;
-using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using System.IO;
 
 namespace HRFunction
 {
@@ -79,7 +76,13 @@ namespace HRFunction
         {
             log.LogInformation("Put new employee." );
 
-            var body = await request.Request.ReadAsStringAsync();
+            //var body = await request.Request.ReadAsStringAsync();
+            string body;
+            using (StreamReader reader = new StreamReader(request.Request.Body))
+            {
+                body = await reader.ReadToEndAsync();
+            }
+
             var resource = JsonConvert.DeserializeObject<ArmResourceBase<EmployeeResource>>(body);
 
             var response = await GetHttpClient().PostAsJsonAsync<Employee>(ApiUri, resource.properties.GetValue());
