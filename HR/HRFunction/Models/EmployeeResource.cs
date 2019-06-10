@@ -13,6 +13,7 @@ namespace HRFunction.Models
 
         public EmployeeResource()
         {
+            id = new Guid().ToString("D");
         }
 
         public EmployeeResource(Employee employee)

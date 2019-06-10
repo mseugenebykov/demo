@@ -1,18 +1,16 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http;
-using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Text;
 using HRFunction.Models;
-using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
+using System.IO;
 
 namespace HRFunction
 {
@@ -24,7 +22,7 @@ namespace HRFunction
 
         [FunctionName("Employees")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "put", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("Employee request. Method: " + req.Method);
@@ -34,17 +32,29 @@ namespace HRFunction
             switch (req.Method.ToUpperInvariant())
             {
                 case "GET": return await Employees.Get(request, log);
-                case "POST": return await Employees.Post(request, log);
+                case "POST": return await Employees.Put(request, log);
+                case "PUT": return await Employees.Put(request, log);
             }
 
             return new HttpResponseMessage(HttpStatusCode.BadRequest);
+        }
+
+        private static HttpClient GetHttpClient()
+        {
+            return GetHttpClient("demo","password");
+        }
+
+        private static HttpClient GetHttpClient(string username, string password)
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
+            return httpClient;
         }
 
         private static async Task<HttpResponseMessage> Get(ArmRequest request, ILogger log)
         {
             log.LogInformation("Get employee collection.");
 
-            var response = await httpClient.GetAsync(ApiUri);
+            var response = await GetHttpClient().GetAsync(ApiUri);
 
             if (response.IsSuccessStatusCode)
             {
@@ -62,14 +72,20 @@ namespace HRFunction
             }
         }
 
-        private static async Task<HttpResponseMessage> Post(ArmRequest request, ILogger log)
+        private static async Task<HttpResponseMessage> Put(ArmRequest request, ILogger log)
         {
-            log.LogInformation("Post employee. ID: " );
+            log.LogInformation("Put new employee." );
 
-            var body = await request.Request.ReadAsStringAsync();
+            //var body = await request.Request.ReadAsStringAsync();
+            string body;
+            using (StreamReader reader = new StreamReader(request.Request.Body))
+            {
+                body = await reader.ReadToEndAsync();
+            }
+
             var resource = JsonConvert.DeserializeObject<ArmResourceBase<EmployeeResource>>(body);
 
-            var response = await httpClient.PostAsJsonAsync<Employee>(ApiUri, resource.properties.GetValue());
+            var response = await GetHttpClient().PostAsJsonAsync<Employee>(ApiUri, resource.properties.GetValue());
             return (response.IsSuccessStatusCode) ?
                 new HttpResponseMessage(HttpStatusCode.OK)
                 {

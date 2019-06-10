@@ -2,16 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using HR.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using System.Text.Encodings.Web;
+using HR.Identity;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using HR.Controllers;
 
 namespace HR
 {
@@ -34,18 +45,28 @@ namespace HR
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
+                .AddScheme<AuthenticationSchemeOptions, ApiAuthenticationHandler>(ApiAuthDefaults.AuthenticationScheme, null)
+                .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+
+            services.AddScoped<IApiUserService, ApiUserService>();
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddHttpClient("employee-functions", c =>
+            services.AddHttpClient(EmployeeFunctionClient.DefaultClientName);
+            services.AddHttpClient(EmployeeFunctionsController.ControllerClientName);
+
+            services.AddMvc()
+            .AddRazorPagesOptions(options =>
             {
-                c.BaseAddress = new Uri("https://api.github.com/");
-            });
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                options.Conventions.AuthorizePage("/Index");
+                options.Conventions.AuthorizePage("/Tools");
+                options.Conventions.AuthorizeFolder("/Employees");
+                options.Conventions.AuthorizeFolder("/EmployeeFunctions");
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HR.Data;
 using HR.Models;
+using Microsoft.AspNetCore.Authorization;
+using HR.Identity;
 
 namespace HR.Controllers
 {
+    [Authorize(AuthenticationSchemes = ApiAuthDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeesController : ControllerBase

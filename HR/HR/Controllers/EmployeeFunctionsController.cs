@@ -3,28 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using HR.Identity;
 using HR.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace HR.Controllers
 {
+    [Authorize(AuthenticationSchemes = ApiAuthDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeFunctionsController : ControllerBase
     {
+        public const string ControllerClientName = "employee-functions-controller";
         private const string EmployeeFunctionName = "Employees";
         private readonly string FunctionURI = "Employees";
 
-        private static HttpClient httpClient = new HttpClient();
+        private static HttpClient httpClient;
 
-        public EmployeeFunctionsController(IConfiguration config)
+        public EmployeeFunctionsController(IConfiguration config, IHttpClientFactory clientFactory)
         {
             FunctionURI = config.GetValue<string>("FunctionSettings:URI") + EmployeeFunctionName;
+            httpClient = clientFactory.CreateClient(ControllerClientName);
         }
 
         // GET: api/EmployeeFunctions
+        [AllowAnonymous]
         [HttpGet]
         public async Task<string> Get()
         {
