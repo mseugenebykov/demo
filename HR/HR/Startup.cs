@@ -23,6 +23,12 @@ using System.Text.Encodings.Web;
 using HR.Identity;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using HR.Controllers;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.CookiePolicy;
+using System.IO;
 
 namespace HR
 {
@@ -45,9 +51,35 @@ namespace HR
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
-                .AddScheme<AuthenticationSchemeOptions, ApiAuthenticationHandler>(ApiAuthDefaults.AuthenticationScheme, null)
-                .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+            services.AddAntiforgery(o => {
+                o.SuppressXFrameOptionsHeader = true;
+                o.Cookie.SameSite = SameSiteMode.None;
+            });
+
+            services.AddDataProtection();
+            var protectionProvider = DataProtectionProvider.Create("MyApplication");
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AnyCookie", policy =>
+                {
+                    policy.AuthenticationSchemes.Add("ARM");
+                    policy.AuthenticationSchemes.Add(AzureADDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                });
+            });
+
+            services.AddAuthentication(o =>
+            {
+                o.DefaultScheme = AzureADDefaults.AuthenticationScheme;
+            })
+            .AddScheme<AuthenticationSchemeOptions, ApiAuthenticationHandler>(ApiAuthDefaults.AuthenticationScheme, null)
+            .AddCookie("ARM", options =>
+            {
+                options.Cookie.Name = "AMAHosted.Token";
+                options.TicketDataFormat = new TicketDataFormat(protectionProvider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", "ARM", "v2"));
+            })
+            .AddAzureAD(options => Configuration.Bind("AzureAd", options));
 
             services.AddScoped<IApiUserService, ApiUserService>();
 
@@ -61,10 +93,11 @@ namespace HR
             services.AddMvc()
             .AddRazorPagesOptions(options =>
             {
-                options.Conventions.AuthorizePage("/Index");
-                options.Conventions.AuthorizePage("/Tools");
-                options.Conventions.AuthorizeFolder("/Employees");
-                options.Conventions.AuthorizeFolder("/EmployeeFunctions");
+                options.Conventions.AuthorizePage("/Index", "AnyCookie");
+                options.Conventions.AuthorizePage("/Tools", "AnyCookie");
+                options.Conventions.AuthorizeFolder("/Employees", "AnyCookie");
+                options.Conventions.AuthorizeFolder("/EmployeeFunctions", "AnyCookie");
+                options.Conventions.AllowAnonymousToPage("/AMAHosted");
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

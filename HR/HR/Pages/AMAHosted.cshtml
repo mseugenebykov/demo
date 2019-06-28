@@ -1,0 +1,54 @@
+﻿@page
+@{
+    Layout = "";
+}
+<html>
+<body>
+    <script language="javascript">
+        function getFromQueryString(name) {
+            var regex = new RegExp('[\\?&]+' + name + '=([^&#]*)');
+            var result = regex.exec(window.location.search);
+            if (!result) return null;
+            if (!result[1]) return null;
+            return decodeURIComponent(result[1]);
+        }
+
+        var trustedAuthority = getFromQueryString("trustedAuthority") || "*";
+        var channelId = "";
+
+        function processMessage(event) {
+            switch (event.type) {
+                case "batch":
+                    event.value.forEach(function (value) { processMessage(value); });
+                    break;
+                case "authContext":
+                    channelId = event.value.channelId;
+                    break;
+                case "authResponse":
+                    event.value.content.value.forEach(function (item) {
+                        document.cookie = item.Token;
+                    });
+                    document.location = document.location.origin + "/" + getFromQueryString("targetUri") + "?channelId=" + channelId + "&trustedAuthority=" + trustedAuthority;
+                    break;
+            }
+        }
+
+        function processLoad(event) {
+            if ((event.origin === "https://portal.azure.com" ||
+                event.origin === "https://ms.portal.azure.com") &&
+                event.data &&
+                event.data.kind === "customMessage") {
+                processMessage(JSON.parse(event.data.data));
+            }
+        }
+
+        if (window.addEventListener) {
+            window.addEventListener("message", processLoad, false);
+        } else {
+            window.attachEvent("onmessage", processLoad);
+        }
+
+        window.parent.postMessage({signature: "FxAppBlade", kind: "ready"}, trustedAuthority);
+    </script>
+</body>
+</html>
